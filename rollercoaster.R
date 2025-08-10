@@ -110,7 +110,7 @@ for (type in c('circular', 'clothoid')) {
     
     ################################################
     
-    # 3. CALCULATE ROLLERCOASTER
+    # 3. SIMULATION LOOP: CALCULATE ROLLERCOASTER POSITION, SPEED AND G FORCES
     
     
     # Parameterize path by cumulative distance 's'
@@ -127,9 +127,9 @@ for (type in c('circular', 'clothoid')) {
     y_spline <- splinefun(s_points, y_points, method = "natural")
     
     # Derivative functions (1st and 2nd derivatives)
-    x_prime <- function(s)  x_spline(s, deriv = 1)
+    x_prime  <- function(s) x_spline(s, deriv = 1)
     x_dprime <- function(s) x_spline(s, deriv = 2)
-    y_prime <- function(s)  y_spline(s, deriv = 1)
+    y_prime  <- function(s) y_spline(s, deriv = 1)
     y_dprime <- function(s) y_spline(s, deriv = 2)
     
     # Curvature function kappa(s) = |x'y'' - y'x''| / (x'^2 + y'^2)^(3/2)
@@ -210,34 +210,11 @@ for (type in c('circular', 'clothoid')) {
                           v = v_vec,
                           Fg = Fg_vec,
                           Fc = Fc_vec)
-    
-    
-    # Calculate unit tangent vector (dx/ds, dy/ds)
-    tangent_x <- x_prime(results$s)
-    tangent_y <- y_prime(results$s)
-    tangent_length <- sqrt(tangent_x^2 + tangent_y^2)
-    tangent_x <- tangent_x / tangent_length
-    tangent_y <- tangent_y / tangent_length
-    
-    # Calculate unit normal vector by rotating tangent 90 degrees CCW:
-    # normal = (-tangent_y, tangent_x)
-    normal_x <- -tangent_y
-    normal_y <- tangent_x
-    
-    # Force vectors components
-    # Gravity force points down (0, -Fg)
-    Fg_x <- rep(0, length(results$x))
-    Fg_y <- -results$Fg  # downward force magnitude
-    
-    # Centrifugal force points along normal (outward)
-    Fc_x <- normal_x * results$Fc
-    Fc_y <- normal_y * results$Fc
-    
-    
+
     
     ################################################
     
-    # 4. PLOT SUM OF FORCES ALONG ROLLERCOASTER
+    # 4. CALCULATE VECTOR COMPONENTS OF Fg, Fc, Fsum
     
     # Calculate unit tangent vector (dx/ds, dy/ds)
     tangent_x <- x_prime(results$s)
@@ -251,17 +228,24 @@ for (type in c('circular', 'clothoid')) {
     normal_y <- -tangent_x
     
     # Force vectors components
+    
+    # Gravity force (Fg)
     Fg_x <- rep(0, length(results$x))
     Fg_y <- -results$Fg
     
+    # Centrifugal force (Fc)
     Fc_x <- normal_x * results$Fc
     Fc_y <- normal_y * results$Fc
     
-    # Vector sum components
+    # Total G force (Fsum)
     Fsum_x <- Fg_x + Fc_x
     Fsum_y <- Fg_y + Fc_y
-    results$Ft <- sqrt(Fsum_x^2 + Fsum_y^2)  # total G force experienced
+    results$Fsum <- sqrt(Fsum_x^2 + Fsum_y^2)  # total G force experienced
     
+
+    ################################################
+    
+    # 5. DISPLAY AND PLOT RESULTS
     
     # Show simulation parameters and results
     text=paste0("SIMULATION PARAMETERS AND RESULTS:\n\n",
@@ -271,10 +255,30 @@ for (type in c('circular', 'clothoid')) {
                 "Total simulation time: ", round(max(results$time), 1), "s\n",
                 "[min, max] speed reached: [", round(min(results$v), 1), ", ",
                     round(max(results$v), 1), "] m/s\n",
-                "[min, max] acceleration experienced: [", round(min(results$Ft)/g, 1), ", ",
-                    round(max(results$Ft)/g, 1), "] G's\n")
+                "[min, max] acceleration experienced: [", round(min(results$Fsum)/g, 1), ", ",
+                    round(max(results$Fsum)/g, 1), "] G's\n")
     cat(text)
     
+    
+    # Plot speed and G force vs time
+    CairoPNG(paste0(type, "_", round(H), "m_", round(v0), "ms_Plots512.png"),
+             width=512, height=800)
+        par(mfrow = c(2, 1))
+        
+        # Plot speed
+        plot(results$time, results$v, ylim=c(0,max(results$v)), type='l', col='red',
+             xlab="Time (s)", ylab="Speed (m/s)")
+        
+        # Plot G force
+        plot(results$time, results$Fsum/g, ylim=c(0,7), type='l', col='red',
+             xlab="Time (s)", ylab="Total experienced force (G's)")
+        abline(h=c(1,6), col="gray", lty="dotted")
+        
+        par(mfrow = c(1, 1))
+    dev.off()
+    
+    
+    # Plot graph of rollercoaster with all vector G forces
     
     # Scale factor for plotting
     scale_factor <- 0.2  # 0.1
@@ -298,7 +302,7 @@ for (type in c('circular', 'clothoid')) {
         Force = "Centrifugal"
     )
     
-    arrows_sum <- data.frame(
+    arrows_Fsum <- data.frame(
         x = results$x, y = results$y,
         xend = results$x + Fsum_x_plot, yend = results$y + Fsum_y_plot,
         Force = "Total"
@@ -307,7 +311,6 @@ for (type in c('circular', 'clothoid')) {
     # Combine Fg and Fc into one for dim gray arrows
     arrows_individual <- rbind(arrows_Fg, arrows_Fc)
     
-    # Plot
     x_mid=11  # <- mean(range(results$x))*1.2
     y_mid=5  # <- mean(range(results$y))
     CairoPNG(paste0(type, "_", round(H), "m_", round(v0), "ms_Graph.png"),
@@ -319,7 +322,7 @@ for (type in c('circular', 'clothoid')) {
                          arrow = arrow(length = unit(0.15, "cm")),
                          color = alpha("gray70", 0.6),
                          size = 0.3) +
-            geom_segment(data = arrows_sum,
+            geom_segment(data = arrows_Fsum,
                          aes(x = x, y = y, xend = xend, yend = yend),
                          arrow = arrow(length = unit(0.3, "cm")),
                          color = "red",
@@ -330,27 +333,6 @@ for (type in c('circular', 'clothoid')) {
                  x = "X (m)", y = "Y (m)") +
             theme_minimal() +
             xlim(0, 50) + ylim(-15, 35)
-    dev.off()
-    
-    
-    
-    ################################################
-    
-    # 5. PLOT SPEED AND G FORCES vs TIME
-    CairoPNG(paste0(type, "_", round(H), "m_", round(v0), "ms_Plots512.png"),
-             width=512, height=800)
-    par(mfrow = c(2, 1))
-        
-        # Plot speed
-        plot(results$time, results$v, ylim=c(0,max(results$v)), type='l', col='red',
-             xlab="Time (s)", ylab="Speed (m/s)")
-        
-        # Plot G forces
-        plot(results$time, results$Ft/g, ylim=c(0,7), type='l', col='red',
-             xlab="Time (s)", ylab="Total experienced force (G's)")
-        abline(h=c(1,6), col="gray", lty="dotted")
-        
-        par(mfrow = c(1, 1))
     dev.off()
 
 }
@@ -369,7 +351,7 @@ ggplot() +
         linewidth = 4
     ) +
     geom_segment(
-        data = arrows_sum,
+        data = arrows_Fsum,
         aes(x = x, y = y, xend = xend, yend = yend),
         arrow = arrow(length = unit(1.5, "cm")),
         color = "gray",
