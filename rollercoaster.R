@@ -1,6 +1,6 @@
 # Simulating G forces on different rollercoaster loop topologies
 # www.overfitting.net
-# https://www.overfitting.net/2025/08/simulando-loops-de-una-montana-rusa-con.html
+# https://www.overfitting.net/2025/08/simulando-loops-de-una-montana-rusa-con_69.html
 
 
 library(pracma)  # fresnelC() and fresnelS() for clothoid
@@ -45,7 +45,7 @@ m <- 1          # mass (kg), cancels out
 
 ################################################
 
-# 2. DEFINE CIRCLE / CLOTHOID ROLLERCOASTER
+# 2. DEFINE CIRCULAR / CLOTHOID ROLLERCOASTER
 
 
 NRESOL=5000
@@ -214,7 +214,7 @@ for (type in c('circular', 'clothoid')) {
     
     ################################################
     
-    # 4. CALCULATE VECTOR COMPONENTS OF Fg, Fc, Fsum
+    # 4. CALCULATE VECTOR COMPONENTS OF Fg, Fc -> Fsum
     
     # Calculate unit tangent vector (dx/ds, dy/ds)
     tangent_x <- x_prime(results$s)
@@ -261,7 +261,7 @@ for (type in c('circular', 'clothoid')) {
     
     
     # Plot speed and G force vs time
-    CairoPNG(paste0(type, "_", round(H), "m_", round(v0), "ms_Plots512.png"),
+    CairoPNG(paste0(type, "_", round(H), "m_", round(v0), "ms_Plots.png"),
              width=512, height=800)
         par(mfrow = c(2, 1))
         
