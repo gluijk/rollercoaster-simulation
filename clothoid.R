@@ -8,14 +8,14 @@ library(png)
 
 
 # Function to generate a standard clothoid (Euler spiral)
-# of length L, reaching a min radius of Rmin, with NPOINTS of resolution
+# of length L, reaching a min radius of Rmin, with n points of resolution
 # L and Rmin share units
-clothoid_coords <- function(NPOINTS, L, Rmin) {
+clothoid_coords <- function(L, Rmin, n=1000) {
     # Scale factor so curvature radius at s = L equals Rmin
-    A <- sqrt(Rmin * L / pi)
+    A = (pi * Rmin * L)^0.5  # pi to match definition of fresnelC()/fresnelS()
     
     # Arc length sampling
-    s <- seq(0, L, length.out = NPOINTS)
+    s <- seq(0, L, length.out = n)
     
     # Normalized arc length
     u <- s / A
@@ -34,9 +34,9 @@ clothoid_coords <- function(NPOINTS, L, Rmin) {
 
 NPOINTS=1000
 L=100   # clothoid total length (m)
-Rmin=30  # min curvature radius (m)
+Rmin=3  # min curvature radius (m)
 
-clothoid=clothoid_coords(NPOINTS, L, Rmin)
+clothoid=clothoid_coords(L, Rmin, NPOINTS)
 x=clothoid$x
 y=clothoid$y
 s=clothoid$s
@@ -56,7 +56,7 @@ CairoPNG("clothoid_params.png", width=512, height=800)
     # Plot radius vs arc length
     Rs=(Rmin * L) / clothoid$s
     plot(s, Rs, type="l", col="red", lwd=2,
-         ylim=c(0,1000),
+         ylim=c(0, 100),
          xlab="Arc length (m)", ylab="Radius (m)",
          main="Radius of curvature along the clothoid")
     abline(h=Rmin, col='gray')
@@ -78,8 +78,8 @@ dev.off()
 
 NPOINTS=1000
 L=50   # clothoid total length (m)
-RMIN=0.1  #Rmin=110  # min curvature radius (m)
-RMAX=2000
+RMIN=0.1  # min curvature radius (m)
+RMAX=200
 NCURVES=100
 
 NFRAMES=1452  # 60,5s at 24fps
@@ -92,7 +92,7 @@ for (i in 0:(NFRAMES-1)) {
              axes=FALSE, xlab="", ylab="")
         for (r in seq(0, 1, length.out=NCURVES)) {
             Rmin=r^1.5 * (((RMAX-RMIN)/(NFRAMES-1)*i+RMIN)-RMIN)+RMIN
-            clothoid=clothoid_coords(NPOINTS, L, Rmin)
+            clothoid=clothoid_coords(L, Rmin, NPOINTS)
 
             # Plot clothoid
             colour=rgb(Rmin/RMAX*0.7, 0.5, max((1-Rmin/RMAX)*0.6,0), 0.5)
@@ -121,4 +121,3 @@ for (i in 0:(NFRAMES-1)) {
 # MP4 Video (MPEG-4 AVC/H.264):
 # ffmpeg -framerate 24 -i clothoidanim_%04d.png -i theexpanse.wav -c:v libx264
 # -crf 18 -pix_fmt yuv420p clothoids.mp4
-
