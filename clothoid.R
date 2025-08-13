@@ -75,6 +75,7 @@ CairoPNG("clothoid.png", width=512, height=512)
          xlim=c(0,max(x)), ylim=c(0,max(y)),
          xlab="X (m)", ylab="Y (m)",
          main=paste0("Clothoid of L=", L, "m and Rmin=", Rmin, "m"))
+    abline(h=0, col='gray')
     symbols(x=xc[NPOINTS], y=yc[NPOINTS], circles=R[NPOINTS],
             inches=FALSE, add=TRUE, fg='gray')
     segments(x[NPOINTS], y[NPOINTS], xc[NPOINTS], yc[NPOINTS],
