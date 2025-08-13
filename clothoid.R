@@ -10,7 +10,7 @@ library(png)
 # Function to generate a standard clothoid (Euler spiral)
 # of length L, reaching a min radius of Rmin, with n points of resolution
 # (L and Rmin share units)
-# Function outputs: x,y coords, s space, radius and centres of circunferences
+# Function outputs: x,y coords, s space, radius and centres of circumferences
 build_clothoid <- function(L, Rmin, n=1000) {
     # Scale factor so curvature radius at s=L equals Rmin
     A <- sqrt(pi * Rmin * L)
@@ -46,7 +46,7 @@ build_clothoid <- function(L, Rmin, n=1000) {
         y = y,
         s = s,  # length position of the clothoid
         radius = radius,  # radius at each point of the clothoid
-        center_x = center_x,  # centres of the tangent circunferences
+        center_x = center_x,  # centres of the tangent circumferences
         center_y = center_y
     ))
 }
