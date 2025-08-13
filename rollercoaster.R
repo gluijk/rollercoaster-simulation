@@ -66,8 +66,9 @@ for (type in c('circular', 'clothoid')) {
     } else if (type=='clothoid') {
         L=90   # clothoid total length (m)
         s=seq(0, L, length.out=NRESOL)
-        RMIN=61.6297  # min curvature radius (m) for max height=30m
-        A=(RMIN*L/pi)^0.5  # ensure at s=L radius of curvature becomes Rmin
+        Rmin=6.244394152  # Rmin for max height=30m
+        # Scale factor so curvature radius at s = L equals Rmin
+        A=(pi * Rmin * L)^0.5
         
         # Calculate clothoid (x,y) positions
         u=s/A
