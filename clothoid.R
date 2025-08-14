@@ -80,6 +80,8 @@ CairoPNG("clothoid.png", width=512, height=512)
             inches=FALSE, add=TRUE, fg='gray')
     segments(x[NPOINTS], y[NPOINTS], xc[NPOINTS], yc[NPOINTS],
              col='gray', lty='dotted')
+    text(x=(x[NPOINTS]+xc[NPOINTS])/2, y=(y[NPOINTS]+yc[NPOINTS])/2,
+         labels=paste0(Rmin, "m"), cex=1)
 dev.off()
 
 CairoPNG("clothoid_params.png", width=512, height=800)
