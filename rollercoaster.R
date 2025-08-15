@@ -4,7 +4,7 @@
 
 
 library(pracma)  # fresnelC() and fresnelS() for clothoid
-library(splines)
+# library(splines)
 library(ggplot2)
 library(Cairo)
 
@@ -343,7 +343,7 @@ for (type in c('circular', 'clothoid')) {
 
 # Creative blueprint plotting
 CairoPNG("beautiful_rollercoaster.png", width=1080*3, height=1080*3)
-ggplot() +
+    ggplot() +
     geom_path(
         data = results,
         aes(x = x, y = y),

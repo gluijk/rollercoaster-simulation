@@ -3,8 +3,8 @@
 # https://www.overfitting.net/2025/08/simulando-loops-de-una-montana-rusa-con_69.html
 
 
-library(pracma)  # fresnelC() and fresnelS() for clothoid
-library(splines)
+# library(pracma)  # fresnelC() and fresnelS() for clothoid
+# library(splines)
 library(ggplot2)
 library(Cairo)
 
@@ -394,7 +394,7 @@ dev.off()
 
 # Creative blueprint plotting
 CairoPNG("beautiful_rollercoaster.png", width=1080*3, height=1080*3)
-ggplot() +
+    ggplot() +
     geom_path(
         data = results,
         aes(x = x, y = y),
