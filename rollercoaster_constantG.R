@@ -1,4 +1,4 @@
-# Simulating G forces on different rollercoaster loop topologies
+# Designing a Constant G rollercoaster loop
 # www.overfitting.net
 # https://www.overfitting.net/2025/08/simulando-loops-de-una-montana-rusa-con_69.html
 
@@ -133,7 +133,7 @@ t_max=999
 dt=0.05      # time step (s)
 
 # Parameters for current new design:
-Gt=4.2  # number of constant G forces (times g)
+Gt=4.2  # number of constant G forces (Gt times g)
 Lc=10
 
 track <- design_constantG_loop(v0 = v0, Gt = Gt, g = g, Lc = Lc)
