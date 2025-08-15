@@ -341,9 +341,8 @@ for (type in c('circular', 'clothoid')) {
 
 
 
-
 # Creative blueprint plotting
-CairoPNG("blueprint_rollercoaste.png", width=1080*3, height=1080*3)
+CairoPNG("beautiful_rollercoaster.png", width=1080*3, height=1080*3)
 ggplot() +
     geom_path(
         data = results,
