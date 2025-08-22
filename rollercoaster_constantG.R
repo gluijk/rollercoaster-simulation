@@ -143,13 +143,13 @@ Gt=4.2  # number of constant G forces (Gt times g)
 Lc=10
 
 simu='3/4 loop'
-#simu='3 loops'  # special run for 3 loops G constant rollercoaster
+# simu='2 loops'  # special run for 3 loops G constant rollercoaster
 if (simu=='3/4 loop') {
     # Clothoidal section + constant G section (1 loop)
     track <- design_constantG_loop(v0 = v0, Gt = Gt, g = g, Lc = Lc, nloop = 0.73)
-} else if (simu=='3 loops') {
+} else if (simu=='2 loops') {
     # Constant G section (3 loops)
-    track <- design_constantG_loop(v0 = v0, Gt = Gt, g = g, Lc = 0, nloop = 3)
+    track <- design_constantG_loop(v0 = v0, Gt = Gt, g = g, Lc = 0, nloop = 2)
 }
 
 # Quick check of G constancy in the loop:
@@ -169,8 +169,8 @@ if (simu=='3/4 loop') {
     # Horizontal section + clothoidal section + constant G section (3/4 loop)
     x_points=c(-15, 0, track$x)+15
     y_points=c(0, 0, track$y)
-} else if (simu=='3 loops') {
-    # Constant G section (3 loops)
+} else if (simu=='2 loops') {
+    # Constant G section (2 loops)
     x_points=track$x
     y_points=track$y
 }
@@ -416,7 +416,7 @@ dev.off()
 
 
 # Creative blueprint plotting
-CairoPNG("beautiful_rollercoaster.png", width=1080*3, height=1080*3)
+CairoPNG("beautiful_rollercoaster.png", width=1080*3, height=1080*2)
     ggplot() +
         geom_path(
             data = results,
