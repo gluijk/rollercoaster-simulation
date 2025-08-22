@@ -14,11 +14,17 @@ design_constantG_loop <- function(v0, Gt, g = 9.80665,
                                   Lc = 5,        # clothoid length (m)
                                   ds_cl = 0.01,  # clothoid arc step (m)
                                   dphi = 0.002,  # loop integration step in radians
-                                  y0 = 0.0) {
+                                  y0 = 0.0,
+                                  nloop = 1) {  # number of G constant loops
     stopifnot(Gt > 1, v0 > 0, g > 0, Lc >= 0, ds_cl > 0, dphi > 0)
     
     # Storage
-    xs <- numeric(); ys <- numeric(); phis <- numeric(); ss <- numeric(); phases <- character(); Ginst <- numeric()
+    xs <- numeric()
+    ys <- numeric()
+    phis <- numeric()
+    ss <- numeric()
+    phases <- character()
+    Ginst <- numeric()
     
     # Helpers ---------------------------------------------------------------
     a_req <- function(phi) {
@@ -80,7 +86,7 @@ design_constantG_loop <- function(v0, Gt, g = 9.80665,
     }
     
     phi0 <- phi
-    phi_end <- phi0 + 2*pi
+    phi_end <- phi0 + 2*pi*nloop
     n_steps <- ceiling((phi_end - phi0) / dphi)
     for (i in 1:n_steps) {
         # RK4 for y(φ)
@@ -124,7 +130,7 @@ design_constantG_loop <- function(v0, Gt, g = 9.80665,
 
 # 1. SIMULATION PARAMETERS
 
-# Example: 20m/s entry speed, target 4.5G total, 5m clothoid
+# Example: 28m/s entry speed, target 4.2G total, 10m clothoid
 
 # Parameters needed by our simulator from rollercoaster topology:
 g=9.80665
@@ -136,7 +142,15 @@ dt=0.05      # time step (s)
 Gt=4.2  # number of constant G forces (Gt times g)
 Lc=10
 
-track <- design_constantG_loop(v0 = v0, Gt = Gt, g = g, Lc = Lc)
+simu='3/4 loop'
+# simu='3 loops'  # special run for 3 loops G constant rollercoaster
+if (simu=='3/4 loop') {
+    # Clothoidal section + constant G section (1 loop)
+    track <- design_constantG_loop(v0 = v0, Gt = Gt, g = g, Lc = Lc, nloop = 0.73)
+} else if (simu=='3 loops') {
+    # Constant G section (3 loops)
+    track <- design_constantG_loop(v0 = v0, Gt = Gt, g = g, Lc = 0, nloop = 3)
+}
 
 # Quick check of G constancy in the loop:
 with(track[track$phase=="loop",], range(G_total))
@@ -144,14 +158,23 @@ with(track[track$phase=="loop",], range(G_total))
 
 # Plot
 plot(track$x, track$y, type="l", asp=1, xlab="x (m)", ylab="y (m)")
+grid()
 
 
 ################################################
 
 # 2. DEFINE CONSTANT G ROLLERCOASTER
 
-x_points=c(-15, 0, track$x[1:round(length(track$x)*4/5)])+15
-y_points=c(0, 0, track$y[1:round(length(track$y)*4/5)])
+if (simu=='3/4 loop') {
+    # Flat section + clothoidal section + constant G section (1 loop)
+    x_points=c(-15, 0, track$x)+15
+    y_points=c(0, 0, track$y)
+} else if (simu=='3 loops') {
+    # Constant G section (3 loops)
+    x_points=c(-0.1, 0, track$x)+0.1
+    y_points=c(0, 0, track$y)
+}
+
 H=max(y_points)
 
 
@@ -365,8 +388,8 @@ arrows_Fsum <- data.frame(
 # Combine Fg and Fc into one for dim gray arrows
 arrows_individual <- rbind(arrows_Fg, arrows_Fc)
 
-x_mid=11  # <- mean(range(results$x))*1.2
-y_mid=5  # <- mean(range(results$y))
+x_mid=11
+y_mid=5
 CairoPNG(paste0("ConstantG_", round(H), "m_", round(v0), "ms_Graph.png"),
          width=1080, height=1080)
     ggplot() +
@@ -395,21 +418,21 @@ dev.off()
 # Creative blueprint plotting
 CairoPNG("beautiful_rollercoaster.png", width=1080*3, height=1080*3)
     ggplot() +
-    geom_path(
-        data = results,
-        aes(x = x, y = y),
-        color = "black",
-        linewidth = 4
-    ) +
-    geom_segment(
-        data = arrows_Fsum,
-        aes(x = x, y = y, xend = xend, yend = yend),
-        arrow = arrow(length = unit(1.5, "cm")),
-        color = "gray",
-        linewidth = 2
-    ) +
-    coord_equal() +
-    theme_void()  # removes axes, gridlines, and background
+        geom_path(
+            data = results,
+            aes(x = x, y = y),
+            color = "black",
+            linewidth = 4
+        ) +
+        geom_segment(
+            data = arrows_Fsum,
+            aes(x = x, y = y, xend = xend, yend = yend),
+            arrow = arrow(length = unit(1.5, "cm")),
+            color = "gray",
+            linewidth = 2
+        ) +
+        coord_equal() +
+        theme_void()  # removes axes, gridlines, and background
 dev.off()
 
 

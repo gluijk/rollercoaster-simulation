@@ -282,7 +282,7 @@ for (type in c('circular', 'clothoid')) {
     # Plot graph of rollercoaster with all vector G forces
     
     # Scale factor for plotting
-    scale_factor <- 0.2  # 0.1
+    scale_factor <- 0.2
     Fg_x_plot <- Fg_x * scale_factor
     Fg_y_plot <- Fg_y * scale_factor
     Fc_x_plot <- Fc_x * scale_factor
