@@ -143,7 +143,7 @@ Gt=4.2  # number of constant G forces (Gt times g)
 Lc=10
 
 simu='3/4 loop'
-# simu='3 loops'  # special run for 3 loops G constant rollercoaster
+#simu='3 loops'  # special run for 3 loops G constant rollercoaster
 if (simu=='3/4 loop') {
     # Clothoidal section + constant G section (1 loop)
     track <- design_constantG_loop(v0 = v0, Gt = Gt, g = g, Lc = Lc, nloop = 0.73)
@@ -166,13 +166,13 @@ grid()
 # 2. DEFINE CONSTANT G ROLLERCOASTER
 
 if (simu=='3/4 loop') {
-    # Flat section + clothoidal section + constant G section (1 loop)
+    # Horizontal section + clothoidal section + constant G section (3/4 loop)
     x_points=c(-15, 0, track$x)+15
     y_points=c(0, 0, track$y)
 } else if (simu=='3 loops') {
     # Constant G section (3 loops)
-    x_points=c(-0.1, 0, track$x)+0.1
-    y_points=c(0, 0, track$y)
+    x_points=track$x
+    y_points=track$y
 }
 
 H=max(y_points)
